@@ -1,0 +1,2 @@
+- Những file nằm trong WEB-INF thì không thể truy cập được trực tiếp thông qua đường dẫn.
+=> che giấu đường dẫn.
