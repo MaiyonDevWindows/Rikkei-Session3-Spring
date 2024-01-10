@@ -15,19 +15,18 @@ public class CategoryServiceImp implements CategoryService{
     public List<Category> findAll() {
         return categoryDAO.findAll();
     }
-
     @Override
     public Category findById(Integer id) {
-        return null;
+        return categoryDAO.findById(id);
     }
 
     @Override
     public Boolean saveOrUpdate(Category category) {
-        return null;
+        return categoryDAO.saveOrUpdate(category);
     }
 
     @Override
     public void delete(Integer id) {
-
+        categoryDAO.delete(id);
     }
 }

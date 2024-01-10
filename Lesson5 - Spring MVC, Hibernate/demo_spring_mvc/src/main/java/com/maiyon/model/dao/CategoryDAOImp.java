@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public class CategoryDAOImp implements CategoryDAO{
@@ -26,8 +25,17 @@ public class CategoryDAOImp implements CategoryDAO{
     }
 
     @Override
-    public Optional findById(Integer id) {
-        return Optional.empty();
+    public Category findById(Integer id) {
+        Session session = sessionFactory.openSession();
+        try{
+            Category category = session.get(Category.class, id);
+            return category;
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+        return null;
     }
 
     @Override
@@ -37,6 +45,15 @@ public class CategoryDAOImp implements CategoryDAO{
 
     @Override
     public void delete(Integer id) {
-
+        Session session = sessionFactory.openSession();
+        try{
+            session.beginTransaction();
+            session.delete(findById(id));
+            session.getTransaction().commit();
+        } catch (Exception e){
+            session.getTransaction().rollback();
+        } finally {
+            session.close();
+        }
     }
 }

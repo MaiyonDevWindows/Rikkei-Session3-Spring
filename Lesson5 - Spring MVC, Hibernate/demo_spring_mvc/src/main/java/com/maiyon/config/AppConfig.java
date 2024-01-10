@@ -30,7 +30,7 @@ public class AppConfig implements WebMvcConfigurer {
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
         dataSource.setUrl("jdbc:mysql://localhost:3306/demo_spring_mvc");
         dataSource.setUsername("root");
-        dataSource.setPassword("root");
+        dataSource.setPassword("S0meth!ng976431");
         return dataSource;
     }
     @Bean

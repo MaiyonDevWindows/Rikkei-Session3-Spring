@@ -35,6 +35,9 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-8">
+                <a href="#">
+                    <button class="btn btn-success">Add new</button>
+                </a>
                 <table class="table">
                     <thead>
                     <tr>
@@ -49,7 +52,15 @@
                             <tr>
                                 <td scope="row">${item.id}</td>
                                 <td>${item.categoryName}</td>
-                                <td>${item.categoryStatus}</td>
+                                <td>${item.categoryStatus ? "Active" : "Inactive"}</td>
+                                <td>
+                                    <a href="update/${item.id}">
+                                        <button class="btn btn-primary">Edit</button>
+                                    </a>
+                                    <a href="delete/${item.id}">
+                                        <button class="btn btn-danger">Delete</button>
+                                    </a>
+                                </td>
                             </tr>
                         </c:forEach>
                     </tbody>
