@@ -23,29 +23,29 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
-<div class="container">
-    <table class="table">
-        <a class="btn btn-success" href="add-category" role="button">Add new</a>
-        <thead>
-        <tr>
-            <th>Category Id</th>
-            <th>Category Name</th>
-            <th>Category Status</th>
-            <th>Action</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="category, index: ${categories}">
-            <td th:text="${index.count}"></td>
-            <td th:text="${category.categoryName}"></td>
-            <td th:text="${category.status} ? 'Active' : 'Inactive'"></td>
-            <td>
-                <a class="btn btn-primary" href="#" role="button">Edit</a>
-                <a class="btn btn-danger" th:href="@{delete/__${category.id}__}" role="button">Delete</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-</div>
+    <div class="container">
+        <table class="table">
+            <a class="btn btn-success" href="add-category" role="button">Add new</a>
+            <thead>
+            <tr>
+                <th>Category Id</th>
+                <th>Category Name</th>
+                <th>Category Status</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="category, index: ${categories}">
+                <td th:text="${index.count}"></td>
+                <td th:text="${category.categoryName}"></td>
+                <td th:text="${category.status} ? 'Active' : 'Inactive'"></td>
+                <td>
+                    <a class="btn btn-primary" th:href="@{edit-category/__${category.id}__}" role="button">Edit</a>
+                    <a class="btn btn-danger" th:href="@{delete-category/__${category.id}__}" role="button">Delete</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>

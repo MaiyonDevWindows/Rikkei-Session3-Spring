@@ -30,8 +30,22 @@
                     <div class="panel-heading">
                         <h2 class="text-center">Add a new category</h2>
                     </div>
-                    <form action="/post-category" >
-
+                    <form action="/add-category" method="post" th:object="${category}">
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label for="user">Category name:</label>
+                                <input type="text" class="form-control" id="user" th:field="*{categoryName}"/>
+                            </div>
+                            <div class="btn-group" data-toggle="buttons">
+                                <label class="btn active">
+                                    <input type="radio" value="1" th:field="*{status}" checked="checked"> Active
+                                </label>
+                                <label class="btn">
+                                    <input type="radio" value="0" th:field="*{status}"> Inactive
+                                </label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success">Submit</button>
                     </form>
                 </div>
             </div>
