@@ -4,7 +4,6 @@ use demo_springBoot_springMVC;
 
 -- Database create first.
 
-
 insert into category
     values (1, 'Quần', 1),
            (2, 'Áo', 1),
