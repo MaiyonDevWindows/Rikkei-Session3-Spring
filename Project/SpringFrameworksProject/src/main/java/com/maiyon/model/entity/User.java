@@ -22,11 +22,7 @@ public class User {
     @Column(name = "user_id")
     private Long userId;
     @Column(nullable = false, unique = true)
-    @Length(min = 6, max = 100,
-            message = "Username must be at least 6 characters, and must not be more than 100 characters.")
-    @Pattern(regexp = "^[^\\W_]+$")
     private String username;
-    @Email(message = "Email is not valid, please try again.")
     private String email;
     @Column(nullable = false)
     private String fullName;
@@ -40,11 +36,10 @@ public class User {
     private String phone;
     @Column(nullable = true)
     private String address;
-    private Date createAt;
+    private Date createAt = new Date();
     private Date updateAt;
     // User - Order: 1 - N.
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @NotNull(message = "User id must not be null.")
     @Column(nullable = false)
     List<Order> orders = new ArrayList<>();
     // User - Address: 1 - N.

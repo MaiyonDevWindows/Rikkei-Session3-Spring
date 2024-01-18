@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/v1/admin/categories")
 public class CategoryController {
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<?> getAll(){
         return new ResponseEntity<>("Danh sach danh", HttpStatus.CREATED);
     }

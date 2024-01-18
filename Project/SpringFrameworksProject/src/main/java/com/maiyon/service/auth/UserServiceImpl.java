@@ -1,15 +1,21 @@
 package com.maiyon.service.auth;
 
 import com.maiyon.model.dto.request.UserLogin;
+import com.maiyon.model.dto.request.UserRegister;
 import com.maiyon.model.dto.response.UserResponse;
 import com.maiyon.model.entity.Role;
 import com.maiyon.model.entity.User;
+import com.maiyon.model.entity.enums.ActiveStatus;
 import com.maiyon.model.entity.enums.RoleName;
 import com.maiyon.repository.RoleRepository;
 import com.maiyon.repository.UserRepository;
 import com.maiyon.security.jwt.JwtProvider;
 import com.maiyon.security.user_principal.UserPrincipal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,12 +24,15 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
+    private final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -33,13 +42,34 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private JwtProvider jwtProvider;
     @Override
-    public User register(User user) {
-        user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
-        Role role = roleRepository.findByRoleName(RoleName.USER);
-        Set<Role> roles = new HashSet<>();
-        roles.add(role);
-        user.setRoles(roles);
-        return userRepository.save(user);
+    public Boolean register(UserRegister userRegister) {
+        if(userRepository.findByUsername(userRegister.getUsername()).isEmpty()){
+            Role roleUser = roleRepository.findByRoleName(RoleName.USER);
+            Set<Role> userRoles = new HashSet<>();
+            userRoles.add(roleUser);
+            User user = User.builder()
+                    .username(userRegister.getUsername())
+                    .password(new BCryptPasswordEncoder().encode(userRegister.getPassword()))
+                    .fullName(userRegister.getFullName())
+                    .email(userRegister.getEmail())
+                    .phone(userRegister.getPhone())
+                    .address(userRegister.getAddress())
+                    .createAt(new Date())
+                    .userStatus(ActiveStatus.ACTIVE)
+                    .roles(userRoles)
+                    .build();
+            try{
+                userRepository.save(user);
+                return true;
+            } catch(DataIntegrityViolationException e){
+                logger.error("Constraint key error " + e);
+            } catch(JpaSystemException e){
+                logger.error("Jpa error " + e);
+            } catch(Exception e){
+                logger.error("Undetermined error " + e);
+            }
+        }
+        return false;
     }
 
     @Override
@@ -49,7 +79,7 @@ public class UserServiceImpl implements UserService {
             authentication = authenticationProvider.
                     authenticate(new UsernamePasswordAuthenticationToken(userLogin.getUsername(),userLogin.getPassword()));
         } catch (AuthenticationException exception){
-            throw new RuntimeException("username or password sai cmnr");
+            throw new RuntimeException("User or password is wrong, please try again.");
         }
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
         String token = jwtProvider.generateToken(userPrincipal);

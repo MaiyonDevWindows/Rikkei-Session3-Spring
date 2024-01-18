@@ -20,11 +20,10 @@ public class UserDetailService implements UserDetailsService {
         Optional<User> userOptional = userRepository.findByUsername(username);
         if(userOptional.isPresent()){
             User user = userOptional.get();
-            UserPrincipal userPrincipal = UserPrincipal.builder().
+            return UserPrincipal.builder().
                    user(user).authorities(user.getRoles().stream().map(
                            item->new SimpleGrantedAuthority(item.getRoleName().toString())
                             ).toList()).build();
-            return userPrincipal;
         }
         return null;
     }
