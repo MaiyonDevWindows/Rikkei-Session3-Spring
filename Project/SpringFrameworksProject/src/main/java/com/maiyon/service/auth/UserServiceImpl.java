@@ -54,8 +54,6 @@ public class UserServiceImpl implements UserService {
                     .email(userRegister.getEmail())
                     .phone(userRegister.getPhone())
                     .address(userRegister.getAddress())
-                    .createAt(new Date())
-                    .userStatus(ActiveStatus.ACTIVE)
                     .roles(userRoles)
                     .build();
             try{
@@ -68,7 +66,7 @@ public class UserServiceImpl implements UserService {
             } catch(Exception e){
                 logger.error("Undetermined error " + e);
             }
-        }
+        } else logger.error("User name is existed, can not sign up with this user name.");
         return false;
     }
 

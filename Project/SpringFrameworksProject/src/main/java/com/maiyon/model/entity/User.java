@@ -1,12 +1,11 @@
 package com.maiyon.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.maiyon.model.entity.enums.ActiveStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.*;
-import org.hibernate.validator.constraints.Length;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.*;
 
@@ -26,8 +25,8 @@ public class User {
     private String email;
     @Column(nullable = false)
     private String fullName;
-    @Enumerated(EnumType.STRING)
-    @Column(name = "user_status")
+    @Enumerated(EnumType.ORDINAL)
+    @Column(name = "user_status", columnDefinition = "BIT(1)")
     private ActiveStatus userStatus;
     @Column(nullable = false)
     private String password;
@@ -36,7 +35,11 @@ public class User {
     private String phone;
     @Column(nullable = true)
     private String address;
-    private Date createAt = new Date();
+    @CreationTimestamp
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    private Date createAt;
+    @UpdateTimestamp
+    @JsonFormat(pattern = "dd/MM/yyyy")
     private Date updateAt;
     // User - Order: 1 - N.
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -59,4 +62,8 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles;
+    @PrePersist
+    public void prePersist(){
+        this.userStatus = (this.userStatus == null) ? ActiveStatus.ACTIVE : ActiveStatus.INACTIVE;
+    }
 }
