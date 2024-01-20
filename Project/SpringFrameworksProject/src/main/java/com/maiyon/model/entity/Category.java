@@ -1,5 +1,6 @@
 package com.maiyon.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.maiyon.model.entity.enums.ActiveStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,10 +22,19 @@ public class Category {
     @Column(nullable = false)
     private String categoryName;
     private String description;
-    @Enumerated(EnumType.STRING)
-    @Column(name = "category_status")
+    @Enumerated(EnumType.ORDINAL)
+    @Column(name = "category_status", columnDefinition = "BIT(1)")
     private ActiveStatus categoryStatus;
     // Category - Product: 1 - N.
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     List<Product> products = new ArrayList<>();
+    @PrePersist
+    public void prePersist(){
+        this.categoryStatus = (this.categoryStatus == null) ? ActiveStatus.ACTIVE : ActiveStatus.INACTIVE;
+    }
+    public Category(String categoryName, String description){
+        this.categoryName = categoryName;
+        this.description = description;
+    }
 }

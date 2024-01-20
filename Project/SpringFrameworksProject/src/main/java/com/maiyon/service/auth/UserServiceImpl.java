@@ -24,10 +24,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,7 +41,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Boolean register(UserRegister userRegister) {
         if(userRepository.findByUsername(userRegister.getUsername()).isEmpty()){
-            Role roleUser = roleRepository.findByRoleName(RoleName.USER);
+            Role roleUser = roleRepository.findByRoleName(RoleName.ROLE_USER);
             Set<Role> userRoles = new HashSet<>();
             userRoles.add(roleUser);
             User user = User.builder()
@@ -72,19 +69,26 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse login(UserLogin userLogin) {
+        UserResponse userResponse = null;
         Authentication authentication;
         try {
             authentication = authenticationProvider.
                     authenticate(new UsernamePasswordAuthenticationToken(userLogin.getUsername(),userLogin.getPassword()));
-        } catch (AuthenticationException exception){
-            throw new RuntimeException("User or password is wrong, please try again.");
+            UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+            String token = jwtProvider.generateToken(userPrincipal);
+            userResponse = UserResponse.builder().
+                    fullName(userPrincipal.getUser().getFullName())
+                    .id(userPrincipal.getUser().getUserId()).token(token).
+                    roles(userPrincipal.getAuthorities()
+                            .stream().map(GrantedAuthority::getAuthority)
+                            .collect(Collectors.toSet())).
+                    build();
+        } catch (AuthenticationException e){
+            logger.error("User or password is invalid");
+            logger.error(e.getMessage());
+        } catch (Exception e){
+            logger.error("Undetermined error " + e);
         }
-        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-        String token = jwtProvider.generateToken(userPrincipal);
-        return UserResponse.builder().
-                fullName(userPrincipal.getUser().getFullName())
-                .id(userPrincipal.getUser().getUserId()).token(token).
-                roles(userPrincipal.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet())).
-                build();
+        return userResponse;
     }
 }

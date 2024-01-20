@@ -1,4 +1,4 @@
-package com.maiyon.model.dto.request;
+package com.maiyon.model.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Builder
-public class UserLogin {
-    private String username;
-    private String password;
+public class CategoryResponse {
+    private Long id;
+    private String categoryName;
+    private String description;
 }

@@ -36,8 +36,8 @@ public class WebSecurityConfig {
                 authenticationProvider(authenticationProvider()).
                 authorizeHttpRequests(
                         (auth)->auth.requestMatchers("/v1/auth/**").permitAll()
-                                .requestMatchers("/v1/admin/**").hasAuthority(RoleName.ADMIN.name())
-                                .requestMatchers("/v1/user/**").hasAuthority(RoleName.USER.name())
+                                .requestMatchers("/v1/admin/**").hasAuthority(RoleName.ROLE_ADMIN.name())
+                                .requestMatchers("/v1/user/**").hasAuthority(RoleName.ROLE_USER.name())
                                 .requestMatchers("/v1/**").permitAll()
                                 .anyRequest().authenticated()
                 ).

@@ -3,10 +3,9 @@ package com.maiyon.service.auth;
 import com.maiyon.model.dto.request.UserLogin;
 import com.maiyon.model.dto.request.UserRegister;
 import com.maiyon.model.dto.response.UserResponse;
-import com.maiyon.model.entity.User;
+import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
+@Service
 public interface UserService {
     Boolean register(UserRegister user);
     UserResponse login(UserLogin userLogin);
