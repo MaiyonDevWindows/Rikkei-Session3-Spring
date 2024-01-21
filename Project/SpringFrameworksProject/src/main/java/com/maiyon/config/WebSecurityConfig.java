@@ -32,21 +32,21 @@ public class WebSecurityConfig {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity.
-                csrf(AbstractHttpConfigurer::disable).
-                authenticationProvider(authenticationProvider()).
-                authorizeHttpRequests(
-                        (auth)->auth.requestMatchers("/v1/auth/**").permitAll()
-                                .requestMatchers("/v1/admin/**").hasAuthority(RoleName.ROLE_ADMIN.name())
-                                .requestMatchers("/v1/user/**").hasAuthority(RoleName.ROLE_USER.name())
-                                .requestMatchers("/v1/**").permitAll()
-                                .anyRequest().authenticated()
-                ).
-                exceptionHandling(
-                        (auth)->auth.authenticationEntryPoint(jwtEntryPoint)
-                                .accessDeniedHandler(accessDenied)
-                ).
-                addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class).
-                build();
+            csrf(AbstractHttpConfigurer::disable).
+            authenticationProvider(authenticationProvider()).
+            authorizeHttpRequests(
+                (auth)->auth
+                    .requestMatchers("/v1/admin/**").hasAuthority(RoleName.ROLE_ADMIN.name())
+                    .requestMatchers("/v1/user/**").hasAuthority(RoleName.ROLE_USER.name())
+                    .requestMatchers("/v1/**").permitAll()
+                    .anyRequest().authenticated()
+            ).
+            exceptionHandling(
+                (auth)->auth.authenticationEntryPoint(jwtEntryPoint)
+                    .accessDeniedHandler(accessDenied)
+            ).
+            addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class).
+            build();
     }
     @Bean
     PasswordEncoder passwordEncoder(){

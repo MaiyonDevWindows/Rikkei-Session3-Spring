@@ -3,7 +3,7 @@ package com.maiyon.controller.auth;
 import com.maiyon.model.dto.request.UserLogin;
 import com.maiyon.model.dto.request.UserRegister;
 import com.maiyon.model.dto.response.UserResponse;
-import com.maiyon.service.auth.UserService;
+import com.maiyon.service.UserService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

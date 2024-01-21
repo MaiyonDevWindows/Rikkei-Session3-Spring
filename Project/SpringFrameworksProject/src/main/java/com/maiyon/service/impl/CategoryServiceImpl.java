@@ -1,14 +1,16 @@
 package com.maiyon.service.impl;
 
+import com.maiyon.model.dto.request.CategoryRequest;
 import com.maiyon.model.dto.response.CategoryResponse;
 import com.maiyon.model.entity.Category;
 import com.maiyon.repository.CategoryRepository;
 import com.maiyon.service.CategoryService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
     private final ModelMapper mapper;
+    private final Logger logger = LoggerFactory.getLogger(CategoryServiceImpl.class);
     CategoryServiceImpl(){
         this.mapper = new ModelMapper();
     }
@@ -28,7 +31,15 @@ public class CategoryServiceImpl implements CategoryService {
         mapper.addMappings(new PropertyMap<Category, CategoryResponse>() {
             @Override
             protected void configure() {
-                map().setId(source.getCategoryId());
+            map().setId(source.getCategoryId());
+            map().setCategoryName(source.getCategoryName());
+            map().setDescription(source.getDescription());
+            }
+        });
+        mapper.addMappings(new PropertyMap<CategoryRequest, Category>() {
+            @Override
+            protected void configure(){
+                map().setCategoryId(source.getCategoryId());
                 map().setCategoryName(source.getCategoryName());
                 map().setDescription(source.getDescription());
             }
@@ -37,20 +48,12 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Page<CategoryResponse> findAll(Pageable pageable){
         List<Category> categories = categoryRepository.findAll();
-        ModelMapper mapper = new ModelMapper();
         List<CategoryResponse> categoryResponses = categories.stream().map(
                 category -> mapper.map(category, CategoryResponse.class)
         ).toList();
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), categoryResponses.size());
         return PageableExecutionUtils.getPage(categoryResponses.subList(start, end), pageable, categoryResponses::size);
-    }
-
-    public static <T> Pageable createPageable(List<T> content, Pageable sourcePageable) {
-        int start = (int) sourcePageable.getOffset();
-        int end = Math.min((start + sourcePageable.getPageSize()), content.size());
-
-        return (Pageable) new PageImpl<>(content.subList(start, end), sourcePageable, content.size());
     }
 
     @Override
@@ -60,9 +63,10 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Optional<CategoryResponse> save(Category category) {
-        Category updateCategory = categoryRepository.save(category);
-        return Optional.ofNullable(mapper.map(updateCategory, CategoryResponse.class));
+    public Optional<CategoryResponse> save(CategoryRequest categoryRequest) {
+        Category updateCategory = mapper.map(categoryRequest, Category.class);
+        Category updatedCategory = categoryRepository.save(updateCategory);
+        return Optional.ofNullable(mapper.map(updatedCategory, CategoryResponse.class));
     }
 
     @Override

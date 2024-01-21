@@ -67,4 +67,9 @@ public class User {
         this.userStatus = (this.userStatus == null || this.userStatus == ActiveStatus.ACTIVE) ?
                 ActiveStatus.ACTIVE : ActiveStatus.INACTIVE;
     }
+    public void toggleStatus(){
+        if (this.userStatus == ActiveStatus.ACTIVE)
+            this.userStatus = ActiveStatus.INACTIVE;
+        else this.userStatus = ActiveStatus.ACTIVE;
+    }
 }

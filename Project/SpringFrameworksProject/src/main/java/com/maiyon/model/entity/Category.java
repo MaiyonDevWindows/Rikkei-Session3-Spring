@@ -5,7 +5,6 @@ import com.maiyon.model.entity.enums.ActiveStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DialectOverride;
 import org.hibernate.annotations.DynamicInsert;
 
 import java.util.ArrayList;

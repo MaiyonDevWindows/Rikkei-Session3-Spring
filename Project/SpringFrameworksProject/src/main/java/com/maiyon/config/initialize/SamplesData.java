@@ -10,12 +10,16 @@ public class SamplesData implements ApplicationListener<ContextRefreshedEvent> {
     @Autowired
     private RoleSamples roleSamples;
     @Autowired
+    private UserSamples userSamples;
+    @Autowired
     private CategorySamples categorySamples;
+    @Autowired
+    private ProductSamples productSamples;
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         roleSamples.initRoleSampleData();
         categorySamples.initCategorySampleData();
+        productSamples.initProductSampleData();
+        userSamples.initUserSampleData();
     }
-
-
 }

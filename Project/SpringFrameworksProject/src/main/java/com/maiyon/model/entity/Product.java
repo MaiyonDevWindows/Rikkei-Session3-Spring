@@ -1,11 +1,12 @@
 package com.maiyon.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.*;
 
@@ -16,27 +17,34 @@ import java.util.*;
 @Builder
 @Entity
 @Table(name = "products")
+@DynamicInsert
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId;
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
+    // Cần dùng prePersist để UUID có thể tự sinh.
+    // Cần dùng preUpdate để UUID có thể tự sinh.
     private String sku;
-    @Column(nullable = false, unique = true)
-    @NotNull(message = "Product name must not be null.")
-    @NotEmpty(message = "Product name must not be empty.")
+    @Column(nullable = false)
     private String productName;
     private String description;
-    private Double unitPrice;
-    @Min(value = 0, message = "Stock quantity must be equals or greater than zero.")
-    private int stockQuantity = 0;
+    @Column(name = "unit_price", columnDefinition = "DECIMAL(10,2) DEFAULT(1)")
+    private Double unitPrice = 1D;
+    @Column(name = "stock_quantity", columnDefinition = "INT DEFAULT(0)")
+    private Integer stockQuantity = 0;
     private String image;
+    @CreationTimestamp
+    @JsonFormat(pattern = "dd/MM/yyyy")
     private Date createdAt;
+    @UpdateTimestamp
+    @JsonFormat(pattern = "dd/MM/yyyy")
     private Date updatedAt;
     // Category - Product: 1 - N.
     @ManyToOne
     @JoinColumn(name = "category_id", referencedColumnName = "category_id")
+    // Cần phải in ra để người dùng biết nếu CategoryId không có sẵn.
     private Category category;
     // Product - User => ShoppingCart: N - N.
     @OneToMany(mappedBy = "product")
@@ -46,4 +54,16 @@ public class Product {
     @OneToMany(mappedBy = "product")
     @JsonIgnore
     private List<WishList> wishLists = new ArrayList<>();
+    @PrePersist
+    private void prePersist(){
+        if(this.sku == null ){
+            this.sku = UUID.randomUUID().toString();
+        }
+    }
+    @PreUpdate
+    private void preUpdate(){
+        if(this.sku == null ){
+            this.sku = UUID.randomUUID().toString();
+        }
+    }
 }
