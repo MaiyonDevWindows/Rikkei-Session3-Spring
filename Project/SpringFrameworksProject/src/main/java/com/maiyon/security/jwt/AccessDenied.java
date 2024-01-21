@@ -1,6 +1,5 @@
 package com.maiyon.security.jwt;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -18,9 +17,9 @@ import java.util.Objects;
 public class AccessDenied implements AccessDeniedHandler {
     private final Logger logger = LoggerFactory.getLogger(AccessDenied.class);
     @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        logger.error("Un permission {}",accessDeniedException.getMessage());
-        ResponseEntity<String> responseEntity = new ResponseEntity<>("Un permission", HttpStatus.FORBIDDEN);
+    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException {
+        logger.error("FORBIDDEN {}",accessDeniedException.getMessage());
+        ResponseEntity<String> responseEntity = new ResponseEntity<>("FORBIDDEN", HttpStatus.FORBIDDEN);
         response.setStatus(responseEntity.getStatusCode().value());
         response.getWriter().write(Objects.requireNonNull(responseEntity.getBody()));
     }

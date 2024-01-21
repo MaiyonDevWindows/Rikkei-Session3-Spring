@@ -5,7 +5,6 @@ import com.maiyon.model.dto.request.UserRegister;
 import com.maiyon.model.dto.response.UserResponse;
 import com.maiyon.model.entity.Role;
 import com.maiyon.model.entity.User;
-import com.maiyon.model.entity.enums.ActiveStatus;
 import com.maiyon.model.entity.enums.RoleName;
 import com.maiyon.repository.RoleRepository;
 import com.maiyon.repository.UserRepository;

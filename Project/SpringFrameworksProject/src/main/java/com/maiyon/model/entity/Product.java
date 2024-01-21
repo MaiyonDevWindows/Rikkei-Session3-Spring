@@ -1,5 +1,6 @@
 package com.maiyon.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
@@ -39,8 +40,10 @@ public class Product {
     private Category category;
     // Product - User => ShoppingCart: N - N.
     @OneToMany(mappedBy = "product")
+    @JsonIgnore
     private List<ShoppingCart> shoppingCarts = new ArrayList<>();
     // Product - User => WishList: N - N.
     @OneToMany(mappedBy = "product")
+    @JsonIgnore
     private List<WishList> wishLists = new ArrayList<>();
 }

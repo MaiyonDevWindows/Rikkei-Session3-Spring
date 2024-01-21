@@ -64,6 +64,7 @@ public class User {
     private Set<Role> roles;
     @PrePersist
     public void prePersist(){
-        this.userStatus = (this.userStatus == null) ? ActiveStatus.ACTIVE : ActiveStatus.INACTIVE;
+        this.userStatus = (this.userStatus == null || this.userStatus == ActiveStatus.ACTIVE) ?
+                ActiveStatus.ACTIVE : ActiveStatus.INACTIVE;
     }
 }

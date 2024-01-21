@@ -20,7 +20,7 @@ public class JwtEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         logger.error(authException.getMessage());
-        ResponseEntity<String> responseEntity = new ResponseEntity<>("Un Authentication", HttpStatus.UNAUTHORIZED);
+        ResponseEntity<String> responseEntity = new ResponseEntity<>("UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
         response.setStatus(responseEntity.getStatusCode().value());
         response.getWriter().write(Objects.requireNonNull(responseEntity.getBody()));
     }

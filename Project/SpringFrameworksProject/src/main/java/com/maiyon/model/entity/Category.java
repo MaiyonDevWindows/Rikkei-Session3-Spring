@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.maiyon.model.entity.enums.ActiveStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DialectOverride;
+import org.hibernate.annotations.DynamicInsert;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +17,7 @@ import java.util.List;
 @Setter
 @Builder
 @Entity
+@DynamicInsert
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +27,7 @@ public class Category {
     private String categoryName;
     private String description;
     @Enumerated(EnumType.ORDINAL)
+    @ColumnDefault(value = "true")
     @Column(name = "category_status", columnDefinition = "BIT(1)")
     private ActiveStatus categoryStatus;
     // Category - Product: 1 - N.
@@ -31,10 +36,7 @@ public class Category {
     List<Product> products = new ArrayList<>();
     @PrePersist
     public void prePersist(){
-        this.categoryStatus = (this.categoryStatus == null) ? ActiveStatus.ACTIVE : ActiveStatus.INACTIVE;
-    }
-    public Category(String categoryName, String description){
-        this.categoryName = categoryName;
-        this.description = description;
+        this.categoryStatus = (this.categoryStatus == null || this.categoryStatus == ActiveStatus.ACTIVE) ?
+                ActiveStatus.ACTIVE : ActiveStatus.INACTIVE;
     }
 }
