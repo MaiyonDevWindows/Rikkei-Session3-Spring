@@ -1,24 +1,17 @@
 package com.maiyon.service.impl;
 
-import com.maiyon.model.dto.request.ProductRequest;
-import com.maiyon.model.dto.request.UserLogin;
-import com.maiyon.model.dto.request.UserRegister;
-import com.maiyon.model.dto.response.ProductResponse;
-import com.maiyon.model.dto.response.UserResponse;
+import com.maiyon.model.dto.request.*;
+import com.maiyon.model.dto.response.UserResponseForLogin;
 import com.maiyon.model.dto.response.UserResponseToAdmin;
-import com.maiyon.model.entity.Product;
+import com.maiyon.model.dto.response.UserResponseToUser;
 import com.maiyon.model.entity.Role;
 import com.maiyon.model.entity.User;
-import com.maiyon.model.entity.enums.ActiveStatus;
 import com.maiyon.model.entity.enums.RoleName;
 import com.maiyon.repository.RoleRepository;
 import com.maiyon.repository.UserRepository;
 import com.maiyon.security.jwt.JwtProvider;
 import com.maiyon.security.user_principal.UserPrincipal;
 import com.maiyon.service.UserService;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.PropertyMap;
-import org.modelmapper.convention.MatchingStrategies;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +25,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -44,6 +39,8 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     @Autowired
     private RoleRepository roleRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     @Autowired
     private AuthenticationProvider authenticationProvider;
     @Autowired
@@ -79,15 +76,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse login(UserLogin userLogin) {
-        UserResponse userResponse = null;
+    public UserResponseForLogin login(UserLogin userLogin) {
+        UserResponseForLogin userResponse = null;
         Authentication authentication;
         try {
             authentication = authenticationProvider.
                     authenticate(new UsernamePasswordAuthenticationToken(userLogin.getUsername(),userLogin.getPassword()));
             UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
             String token = jwtProvider.generateToken(userPrincipal);
-            userResponse = UserResponse.builder().
+            userResponse = UserResponseForLogin.builder().
                     fullName(userPrincipal.getUser().getFullName())
                     .id(userPrincipal.getUser().getUserId()).token(token).
                     roles(userPrincipal.getAuthorities()
@@ -116,6 +113,51 @@ public class UserServiceImpl implements UserService {
     public Optional<UserResponseToAdmin> findById(Long id) {
         Optional<User> user = userRepository.findById(id);
         return user.map(this::builderUserResponseToAdmin);
+    }
+
+    @Override
+    public Optional<UserResponseToUser> getUserAccountDetail() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserPrincipal userPrincipal) {
+            Optional<User> user = userRepository.findUserByUserId(userPrincipal.getUser().getUserId());
+            return user.map(this::builderUserResponseToUser);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public UserResponseToUser updateUserAccountDetail(UserDetailRequest userRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserPrincipal userPrincipal) {
+            User user = userPrincipal.getUser();
+            user.setFullName(userRequest.getFullName());
+            user.setEmail(userRequest.getEmail());
+            user.setAvatar(userRequest.getAvatar());
+            user.setPhone(userRequest.getPhone());
+            user.setAddress(userRequest.getAddress());
+            User updatedUser = userRepository.save(user);
+            return builderUserResponseToUser(updatedUser);
+        }
+        return null;
+    }
+
+    @Override
+    public UserResponseToUser updatePasswordAccount(UserChangePwdRequest userRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserPrincipal userPrincipal) {
+            if (!passwordEncoder.matches(userRequest.getOldPassword(), userPrincipal.getPassword())) {
+                logger.error("Old password not true.");
+            } else if (userPrincipal.getPassword().equals(userRequest.getNewPassword())) {
+                logger.error("New password must be different Old password.");
+            } else if (!userRequest.getNewPassword().equals(userRequest.getNewPasswordConfirm())) {
+                logger.error("New password confirm must like new password.");
+            }
+            User user = userPrincipal.getUser();
+            user.setPassword(passwordEncoder.encode(userRequest.getNewPassword()));
+            User updatedUser = userRepository.save(user);
+            return builderUserResponseToUser(updatedUser);
+        }
+        return null;
     }
 
     @Override
@@ -178,17 +220,28 @@ public class UserServiceImpl implements UserService {
 
     public UserResponseToAdmin builderUserResponseToAdmin(User user){
         return UserResponseToAdmin.builder()
-                .userId(user.getUserId())
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .fullName(user.getFullName())
-                .userStatus(user.getUserStatus())
-                .email(user.getEmail())
-                .phone(user.getPhone())
-                .address(user.getAddress())
-                .createdAt(user.getCreateAt())
-                .updatedAt(user.getUpdateAt())
-                .roles(user.getRoles())
-                .build();
+            .userId(user.getUserId())
+            .username(user.getUsername())
+            .password(user.getPassword())
+            .fullName(user.getFullName())
+            .userStatus(user.getUserStatus())
+            .email(user.getEmail())
+            .phone(user.getPhone())
+            .address(user.getAddress())
+            .createdAt(user.getCreateAt())
+            .updatedAt(user.getUpdateAt())
+            .roles(user.getRoles())
+            .build();
+    }
+    public UserResponseToUser builderUserResponseToUser(User user){
+        return UserResponseToUser.builder()
+            .username(user.getUsername())
+            .fullName(user.getFullName())
+            .email(user.getEmail())
+            .phone(user.getPhone())
+            .address(user.getAddress())
+            .createdAt(user.getCreateAt())
+            .updatedAt(user.getUpdateAt())
+            .build();
     }
 }

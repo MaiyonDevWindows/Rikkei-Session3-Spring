@@ -69,6 +69,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public Product getProductById(Long id) {
+        Optional<Product> product = productRepository.findById(id);
+        return product.orElse(null);
+    }
+
+    @Override
     public Page<ProductResponse> findByCategoryId(Pageable pageable, Long categoryId) {
         Optional<Category> category = categoryRepository.findById(categoryId);
         if(category.isPresent()){
@@ -107,5 +113,16 @@ public class ProductServiceImpl implements ProductService {
         if(product.isEmpty()) return false;
         productRepository.deleteById(id);
         return true;
+    }
+    public ProductResponse buildProductResponse(Product product){
+        return ProductResponse.builder()
+            .id(product.getProductId())
+            .productName(product.getProductName())
+            .description(product.getDescription())
+            .unitPrice(product.getUnitPrice())
+            .stockQuantity(product.getStockQuantity())
+            .imageUrl(product.getImage())
+            .category(product.getCategory())
+            .build();
     }
 }

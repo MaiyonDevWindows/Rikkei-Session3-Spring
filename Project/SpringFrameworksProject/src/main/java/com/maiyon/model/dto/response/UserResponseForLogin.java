@@ -11,7 +11,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Data
 @Builder
-public class UserResponse {
+public class UserResponseForLogin {
     private Long id;
     private String fullName;
     private String token;

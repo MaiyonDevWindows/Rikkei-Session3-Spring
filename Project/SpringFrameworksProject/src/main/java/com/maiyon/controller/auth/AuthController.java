@@ -2,7 +2,7 @@ package com.maiyon.controller.auth;
 
 import com.maiyon.model.dto.request.UserLogin;
 import com.maiyon.model.dto.request.UserRegister;
-import com.maiyon.model.dto.response.UserResponse;
+import com.maiyon.model.dto.response.UserResponseForLogin;
 import com.maiyon.service.UserService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -31,7 +31,7 @@ public class AuthController {
     }
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserLogin userLogin){
-        Optional<UserResponse> userOptional = Optional.ofNullable(userService.login(userLogin));
+        Optional<UserResponseForLogin> userOptional = Optional.ofNullable(userService.login(userLogin));
         if(userOptional.isPresent()){
             logger.info("User {} logged in.", userLogin.getUsername());
             return new ResponseEntity<>(userOptional.get(), HttpStatus.OK);
