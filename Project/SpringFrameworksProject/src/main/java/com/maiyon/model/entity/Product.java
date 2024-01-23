@@ -2,6 +2,8 @@ package com.maiyon.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.maiyon.model.dto.request.ProductRequest;
+import com.maiyon.model.dto.response.ProductResponse;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

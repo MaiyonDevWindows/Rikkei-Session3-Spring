@@ -86,9 +86,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private Page<ProductResponse> convertListToPageProductResponses(Pageable pageable, List<Product> products) {
-        List<ProductResponse> productResponses = products.stream().map(
-                product -> mapper.map(product, ProductResponse.class)
-        ).toList();
+        List<ProductResponse> productResponses = products.stream().map(this::entityMap).toList();
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), productResponses.size());
         return PageableExecutionUtils.getPage(productResponses.subList(start, end), pageable, productResponses::size);
@@ -114,7 +112,20 @@ public class ProductServiceImpl implements ProductService {
         productRepository.deleteById(id);
         return true;
     }
-    public ProductResponse buildProductResponse(Product product){
+    @Override
+    public Product entityMap(ProductRequest productRequest){
+        return Product.builder()
+                .productId(productRequest.getProductId())
+                .productName(productRequest.getProductName())
+                .description(productRequest.getDescription())
+                .unitPrice(productRequest.getUnitPrice())
+                .stockQuantity(productRequest.getStockQuantity())
+                .image(productRequest.getImageUrl())
+                .category(categoryRepository.findById(productRequest.getCategoryId()).orElse(null))
+                .build();
+    }
+    @Override
+    public ProductResponse entityMap(Product product){
         return ProductResponse.builder()
             .id(product.getProductId())
             .productName(product.getProductName())

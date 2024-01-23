@@ -16,4 +16,6 @@ public interface ProductService {
     Page<ProductResponse> searchByNameOrDescription(Pageable pageable, String keyword);
     Optional<ProductResponse> save(ProductRequest productRequest);
     Boolean delete(Long id);
+    Product entityMap(ProductRequest productRequest);
+    ProductResponse entityMap(Product product);
 }
